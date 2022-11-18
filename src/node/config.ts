@@ -169,6 +169,8 @@ export interface SiteConfig<ThemeConfig = any>
   pages: string[]
 }
 
+// 去docs下的.vitepress 文件夹下寻找对应的文件
+// 将多个文件夹连接在一起，形成一个路径
 const resolve = (root: string, file: string) =>
   normalizePath(path.resolve(root, `.vitepress`, file))
 
@@ -193,11 +195,14 @@ export async function resolveConfig(
   command: 'serve' | 'build' = 'serve',
   mode = 'development'
 ): Promise<SiteConfig> {
+  // command 为默认值 serve, mode 为默认值 development
   const [userConfig, configPath, configDeps] = await resolveUserConfig(
     root,
     command,
     mode
   )
+  // site 里面就是所有的配置信息，这里的信息指的是在.vitepress/config.ts中的信息
+  // userConfig 就是 .vitepress/config.ts中的信息
   const site = await resolveSiteData(root, userConfig)
   const srcDir = path.resolve(root, userConfig.srcDir || '.')
   const outDir = userConfig.outDir
@@ -216,6 +221,7 @@ export async function resolveConfig(
   // order in shared chunks which in turns invalidates the hash of every chunk!
   // JavaScript built-in sort() is mandated to be stable as of ES2019 and
   // supported in Node 12+, which is required by Vite.
+  // 会找到所有docs下的md文件
   const pages = (
     await fg(['**.md'], {
       cwd: srcDir,
@@ -249,7 +255,7 @@ export async function resolveConfig(
     transformHtml: userConfig.transformHtml,
     transformPageData: userConfig.transformPageData
   }
-
+  console.log('final config', config)
   return config
 }
 
@@ -261,20 +267,27 @@ async function resolveUserConfig(
   mode: string
 ): Promise<[UserConfig, string | undefined, string[]]> {
   // load user config
+  // configPath 就是 .vitepress/config.js(config.ts)
   const configPath = supportedConfigExtensions
     .map((ext) => resolve(root, `config.${ext}`))
     .find(fs.pathExistsSync)
+
+  // console.log('user config path', configPath)
 
   let userConfig: RawConfigExports = {}
   let configDeps: string[] = []
   if (!configPath) {
     debug(`no config file found.`)
   } else {
+    // loadConfigFromFile({'serve', 'development'}, '.vitepress/config.ts', 'docs')
+    // loadConfigFromFile 是用来解析配置的
     const configExports = await loadConfigFromFile(
       { command, mode },
       configPath,
       root
     )
+
+    console.log('configExports', configExports)
     if (configExports) {
       userConfig = configExports.config
       configDeps = configExports.dependencies.map((file) =>
@@ -283,7 +296,7 @@ async function resolveUserConfig(
     }
     debug(`loaded config at ${c.yellow(configPath)}`)
   }
-
+  // resolveConfigExtends 是用来加载扩展配置的
   return [await resolveConfigExtends(userConfig), configPath, configDeps]
 }
 
@@ -327,6 +340,14 @@ function isObject(value: unknown): value is Record<string, any> {
   return Object.prototype.toString.call(value) === '[object Object]'
 }
 
+/**
+ * 用来给 userConfig 添加默认值
+ * @param root 根目录，指的是docs
+ * @param userConfig 用户配置信息
+ * @param command 命令 serve 或者 build
+ * @param mode 开发模式 development 或者 build
+ * @returns
+ */
 export async function resolveSiteData(
   root: string,
   userConfig?: UserConfig,
@@ -340,6 +361,7 @@ export async function resolveSiteData(
     title: userConfig.title || 'VitePress',
     titleTemplate: userConfig.titleTemplate,
     description: userConfig.description || 'A VitePress site',
+    // 处理 base 信息
     base: userConfig.base ? userConfig.base.replace(/([^/])$/, '$1/') : '/',
     head: resolveSiteDataHead(userConfig),
     appearance: userConfig.appearance ?? true,

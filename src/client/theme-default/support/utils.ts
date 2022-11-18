@@ -61,6 +61,11 @@ export function isActive(
   return true
 }
 
+/**
+ * 如果路径以/开头，就返回path, 否则加上/
+ * @param path 文章路径
+ * @returns
+ */
 export function ensureStartingSlash(path: string): string {
   return /^\//.test(path) ? path : `/${path}`
 }

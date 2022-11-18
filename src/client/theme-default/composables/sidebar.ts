@@ -2,9 +2,14 @@ import { computed, onMounted, onUnmounted, Ref, ref, watchEffect } from 'vue'
 import { useData, useRoute } from 'vitepress'
 import { getSidebar } from '../support/sidebar.js'
 
+// 如果想要改那个enhancement issue, 应该是在这里调整
+
 export function useSidebar() {
   const route = useRoute()
   const { theme, frontmatter } = useData()
+
+  // console.log('useSidebar', theme.value)
+  // console.log('useSidebar sidebar', theme.value.sidebar)
 
   const isOpen = ref(false)
 
@@ -13,6 +18,8 @@ export function useSidebar() {
     const relativePath = route.data.relativePath
     return sidebarConfig ? getSidebar(sidebarConfig, relativePath) : []
   })
+
+  console.log('sidebar', sidebar.value)
 
   const hasSidebar = computed(() => {
     return (

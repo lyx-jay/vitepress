@@ -32,27 +32,16 @@ watchPostEffect(async () => {
 </script>
 
 <template>
-  <aside
-    v-if="hasSidebar"
-    class="VPSidebar"
-    :class="{ open }"
-    ref="navEl"
-    @click.stop
-  >
+  <aside v-if="hasSidebar" class="VPSidebar" :class="{ open }" ref="navEl" @click.stop>
     <nav class="nav" id="VPSidebarNav" aria-labelledby="sidebar-aria-label" tabindex="-1">
       <span class="visually-hidden" id="sidebar-aria-label">
         Sidebar Navigation
       </span>
-
       <slot name="sidebar-nav-before" />
 
       <div v-for="group in sidebar" :key="group.text" class="group">
-        <VPSidebarGroup
-          :text="group.text"
-          :items="group.items"
-          :collapsible="group.collapsible"
-          :collapsed="group.collapsed"
-        />
+        <VPSidebarGroup :text="group.text" :items="group.items" :collapsible="group.collapsible"
+          :collapsed="group.collapsed" />
       </div>
 
       <slot name="sidebar-nav-after" />
@@ -84,7 +73,7 @@ watchPostEffect(async () => {
   visibility: visible;
   transform: translateX(0);
   transition: opacity 0.25s,
-              transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .dark .VPSidebar {
@@ -117,7 +106,7 @@ watchPostEffect(async () => {
   outline: 0;
 }
 
-.group + .group {
+.group+.group {
   margin-top: 32px;
   border-top: 1px solid var(--vp-c-divider-light);
   padding-top: 10px;
@@ -129,7 +118,7 @@ watchPostEffect(async () => {
     width: calc(var(--vp-sidebar-width) - 64px);
   }
 
-  .group + .group {
+  .group+.group {
     margin-top: 24px;
   }
 }

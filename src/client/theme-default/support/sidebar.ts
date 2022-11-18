@@ -18,18 +18,19 @@ export function getSidebar(
   if (sidebar == null) {
     return []
   }
-
+  console.log('sidebar', sidebar)
   path = ensureStartingSlash(path)
-
+  // console.log('keys', Object.keys(sidebar))
   const dir = Object.keys(sidebar)
     .sort((a, b) => {
       return b.split('/').length - a.split('/').length
     })
     .find((dir) => {
+      // console.log('dir', dir)
       // make sure the multi sidebar key starts with slash too
       return path.startsWith(ensureStartingSlash(dir))
     })
-
+  // console.log('dir', dir)
   return dir ? sidebar[dir] : []
 }
 
